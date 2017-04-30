@@ -9,11 +9,13 @@ chkTimer      = 3
 threshold     = 10
 
 [Scanner]
-deviceId      = 0
-loops         = 1
-filter        = ""
-topic_id      = /lab3/ble/rssi/
-nearest_id    = /lab3/ble/nearest/
+deviceId              = 0
+loops                 = 1
+filter                = ""
+topic_id              = ble/rssi/
+nearest_id            = ble/nearest/
+beacon_UUID           = 738846f5040b487eaa318d0edd18f6df
+proximity_threshold   = -50
 
 [Emitter]
 sleepInterval = 3

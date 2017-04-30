@@ -1,5 +1,6 @@
 #
 # by Taka Wang
+# edited by Jason Perreault
 #
 
 import ConfigParser
@@ -25,7 +26,7 @@ def initMQTT(url = "localhost", port = 1883, keepalive = 60):
         print(e)
         return None
 
-def startScan(mqttclnt, filter="", topic="/ble/rssi/"):
+def startScan(mqttclnt, beacon_UUID, pThreshold, filter="", topic="/ble/rssi/"):
     """Scan BLE beacon and publish to MQTT broker"""
     if mqttclnt:
         scanner = Scanner()
@@ -33,11 +34,14 @@ def startScan(mqttclnt, filter="", topic="/ble/rssi/"):
 	    #print("Inside while true in startScan()")
             for beacon in scanner.scan():
                 fields = beacon.split(",")
-                if fields[1].startswith(filter):
-                    mqttclnt.publish(topic, '{"id":"%s","val":"%s"}' % (fields[0], fields[5]))
-                    if DEBUG: 
-                        print(fields[0], fields[5])
-                        print(topic)
+                if fields[1].startswith(filter) and fields[1] == beacon_UUID:
+                    
+                    print(fields[5], fields[2], fields[3])
+                    if int(fields[5]) > int(pThreshold):
+                        mqttclnt.publish(topic, '{"id":"%s","val":"%s"}' % (fields[2], fields[5]))
+                        if DEBUG: 
+                            #print(fields[0], fields[5])
+                            print(topic)
 
 def init():
     """Read config file"""
@@ -51,9 +55,11 @@ def init():
     ret["keepalive"] = int(config.get('MQTT', 'keepalive'))
     ret["filter"]    = config.get('Scanner', 'filter')
     ret["topic_id"]  = config.get('Scanner', 'topic_id')
+    ret["beacon_UUID"] = config.get('Scanner', 'beacon_UUID')
+    ret["proximity_threshold"] = config.get('Scanner', 'proximity_threshold')
     return ret
 
 if __name__ == '__main__':
     conf = init()
     clnt = initMQTT(conf["url"], conf["port"], conf["keepalive"])
-    startScan(clnt, conf["filter"], conf["topic_id"])
+    startScan(clnt, conf["beacon_UUID"], conf["proximity_threshold"], conf["filter"], conf["topic_id"])
