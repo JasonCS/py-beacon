@@ -1,6 +1,7 @@
 # py-beacon
 
 BLE beacon scanner in python.
+Forked from https://github.com/taka-wang/py-beacon
 
 ## Message Flow
 
